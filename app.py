@@ -59,7 +59,6 @@ def update(id):
         if task.deadline:
             task.deadline = datetime.strptime(task.deadline, '%Y-%m-%d')
             task.completed = 'completed' in request.form
-            
         try: 
             db.session.commit()
             return redirect('/')
@@ -70,7 +69,20 @@ def update(id):
 
 migrate = Migrate(app, db)
 
+@app.route('/complete/<int:id>', methods=['POST'])
+def complete(id):
+    task = ToDo.query.get_or_404(id)
+    task.completed = not task.completed  # Toggle the completed status
+
+    try:
+        db.session.commit()
+        return redirect('/')
+    except:
+        return 'There was a problem marking this task as completed'
+
+
 if __name__ == "__main__":
     # with app.app_context():
     #     db.create_all()  # Create the database tables
     app.run(debug=True)
+
